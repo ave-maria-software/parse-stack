@@ -53,15 +53,19 @@ module ConstraintTests
   end
 end
 
-module MiniTest
+# Modern minitest (>= 5) uses the `Minitest` namespace; the old `MiniTest`
+# spelling defined a parallel module that the framework never loads, silently
+# turning refute_raises/wont_raise into no-ops (4 tests error under new
+# minitest). Reopen the REAL namespace. (Shim carried from gigtown's lineage.)
+module Minitest
   module Assertions
     def refute_raises(*exp)
       msg = "#{exp.pop}.\n" if String === exp.last
 
       begin
         yield
-      rescue MiniTest::Skip => e
-        return e if exp.include? MiniTest::Skip
+      rescue Minitest::Skip => e
+        return e if exp.include? Minitest::Skip
         raise e
       rescue Exception => e
         exp = exp.first if exp.size == 1
