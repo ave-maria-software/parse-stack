@@ -69,7 +69,6 @@ module Parse
     # Register a new symbol operator method mapped to a specific {Parse::Constraint}.
     def self.register(op, klass)
       Operation.operators[op.to_sym] = klass
-      op = :object_id if op.to_sym == :id
       Symbol.send :define_method, op do |value = nil|
         operation = Operation.new self, op
         value.nil? ? operation : operation.constraint(value)
