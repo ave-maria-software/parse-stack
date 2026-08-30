@@ -271,7 +271,9 @@ module Parse
     def as_json(opts = nil)
       return pointer if pointer?
       changed_fields = changed_attributes
-      super(opts).delete_if { |k, v| v.nil? && !changed_fields.has_key?(k) }
+      # ActiveModel::Dirty#as_json (added in Rails 8.1) reads options[:except]
+      # without a nil guard, so super must never receive a literal nil.
+      super(opts || {}).delete_if { |k, v| v.nil? && !changed_fields.has_key?(k) }
     end
 
     # The main constructor for subclasses. It can take different parameter types
