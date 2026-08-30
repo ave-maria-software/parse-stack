@@ -49,5 +49,14 @@ jobs:
           ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
           export GIT_SSH_COMMAND="ssh -i ~/.ssh/mirror_key -o IdentitiesOnly=yes"
           git push git@github.com:ave-maria-software/parse-stack.git HEAD:main
-          # --follow-tags skips tags when main is already up to date -> explicit:
-          git push git@github.com:ave-maria-software/parse-stack.git --tags
+          # --follow-tags skips tags when main is already up to date -> explicit.
+          # A `git push origin main --tags` in the working repo triggers TWO runs
+          # (branch event + tag event) that race to publish the same tag; the
+          # loser gets a harmless "already exists" rejection. Tolerate exactly
+          # that case so the run stays green, without masking real failures.
+          out=$(git push git@github.com:ave-maria-software/parse-stack.git --tags 2>&1) || {
+            echo "$out"
+            echo "$out" | grep -q "already exists" || exit 1
+            echo "Tag already published by the concurrent run — OK."
+          }
+          echo "$out"
