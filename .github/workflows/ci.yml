@@ -8,6 +8,9 @@ on:
 
 jobs:
   test:
+    # Guard: these workflows travel to the mirror with the tree; they must
+    # only run in the working repo (the mirror has no secrets and nothing to do).
+    if: github.repository == 'ave-maria-software/parse-stack-dev'
     name: test (ruby ${{ matrix.ruby }} / activesupport ${{ matrix.activesupport }})
     runs-on: ubuntu-latest
     strategy:
@@ -42,6 +45,9 @@ jobs:
       - run: bundle exec rake test
 
   secrets_scan:
+    # Guard: these workflows travel to the mirror with the tree; they must
+    # only run in the working repo (the mirror has no secrets and nothing to do).
+    if: github.repository == 'ave-maria-software/parse-stack-dev'
     name: secrets scan (detector — the barrier is the publisher)
     runs-on: ubuntu-latest
     steps:

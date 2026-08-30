@@ -18,6 +18,9 @@ concurrency:
 
 jobs:
   scan_and_publish:
+    # Guard: these workflows travel to the mirror with the tree; they must
+    # only run in the working repo (the mirror has no secrets and nothing to do).
+    if: github.repository == 'ave-maria-software/parse-stack-dev'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
