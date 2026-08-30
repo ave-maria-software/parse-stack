@@ -1,0 +1,50 @@
+name: Publish to public mirror
+
+# THE credential barrier: the public mirror only receives pushes from this
+# workflow, and this workflow scans everything publishable before each push.
+# Nobody — admins included — can push to the mirror directly; a repository
+# ruleset with no human bypass enforces that.
+#
+# The mirror's write deploy key lives in the MIRROR_DEPLOY_KEY secret.
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+concurrency:
+  group: publish-mirror
+  cancel-in-progress: false
+
+jobs:
+  scan_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Hash-based scan of the ENTIRE publishable history
+        # Full history, not just the delta: the mirror exposes every commit's
+        # whole tree, and this job is the last line before public.
+        run: ruby bin/check_no_secrets --all-history
+
+      - name: gitleaks over the full history
+        run: |
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz \
+            | tar xz gitleaks
+          ./gitleaks git . --no-banner --redact
+          rm gitleaks
+
+      - name: Push to the public mirror
+        env:
+          DEPLOY_KEY: ${{ secrets.MIRROR_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/mirror_key
+          chmod 600 ~/.ssh/mirror_key
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/mirror_key -o IdentitiesOnly=yes"
+          git push git@github.com:ave-maria-software/parse-stack.git HEAD:main
+          # --follow-tags skips tags when main is already up to date -> explicit:
+          git push git@github.com:ave-maria-software/parse-stack.git --tags

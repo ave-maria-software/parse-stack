@@ -1,0 +1,5 @@
+#!/bin/sh
+# Early local feedback (the hard barrier is the publish workflow, which runs
+# the same scan over the full history before every mirror push). Enable with:
+#   git config core.hooksPath .githooks
+exec ruby bin/check_no_secrets --staged

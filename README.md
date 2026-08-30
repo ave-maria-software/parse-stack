@@ -1,3 +1,9 @@
+> Maintained fork of **parse-stack**, the Parse Server SDK for Ruby
+> (upstream: [modernistik/parse-stack](https://github.com/modernistik/parse-stack), MIT;
+> base lineage: [mobilecause/parse-stack](https://github.com/mobilecause/parse-stack)).
+> What changed and why: [docs/DIVERGENCE.md](docs/DIVERGENCE.md).
+> Published as a read-only mirror — direct pushes are disabled by repository rules.
+
 ![Parse Stack - The Parse Server Ruby Client SDK](https://raw.githubusercontent.com/modernistik/parse-stack/master/parse-stack.png?raw=true)
 
 A full featured Active Model ORM and Ruby REST API for Parse-Server. [Parse Stack](https://github.com/modernistik/parse-stack) is the [Parse Server](http://parseplatform.org/) SDK, REST Client and ORM framework for [Ruby](https://www.ruby-lang.org/en/). It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
