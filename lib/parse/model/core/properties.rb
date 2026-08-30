@@ -119,7 +119,10 @@ module Parse
         data_type = :boolean if data_type == :bool
         data_type = :timezone if data_type == :time_zone
         data_type = :geopoint if data_type == :geo_point
-        data_type = :integer if data_type == :int || data_type == :number
+        # elamonica 2022 (upstream issue #73, never answered): Parse Numbers are
+        # doubles — coercing :number/:int to :integer TRUNCATES floats on the
+        # write path. :float is lossless for both.
+        data_type = :float if data_type == :int || data_type == :number
 
         # set defaults
         opts = { required: false,
