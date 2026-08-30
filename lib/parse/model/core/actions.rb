@@ -193,7 +193,7 @@ module Parse
         #  end
         # @note You cannot use *:updated_at* as a constraint.
         # @return [Boolean] true if all saves succeeded and there were no errors.
-        def save_all(constraints = {})
+        def save_all(constraints = {}, &save_all_block)
           invalid_constraints = constraints.keys.any? do |k|
             (k == :updated_at || k == :updatedAt) ||
             (k.is_a?(Parse::Operation) && (k.operand == :updated_at || k.operand == :updatedAt))
@@ -206,8 +206,8 @@ module Parse
           force = false
           batch_size = 250
           iterator_block = nil
-          if block_given?
-            iterator_block = Proc.new
+          if save_all_block
+            iterator_block = save_all_block
             force ||= false
           else
             # if no block given, assume you want to just save all objects

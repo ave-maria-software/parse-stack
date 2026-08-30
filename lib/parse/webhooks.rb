@@ -29,9 +29,9 @@ module Parse
     # @yield (see Parse::Object.webhook)
     # @param block (see Parse::Object.webhook)
     # @return (see Parse::Object.webhook)
-    def self.webhook_function(functionName, block = nil)
-      if block_given?
-        Parse::Webhooks.route(:function, functionName, &Proc.new)
+    def self.webhook_function(functionName, block = nil, &blk)
+      if blk
+        Parse::Webhooks.route(:function, functionName, &blk)
       else
         block = functionName.to_s.underscore.to_sym if block.blank?
         block = method(block.to_sym) if block.is_a?(Symbol)
